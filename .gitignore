@@ -11,8 +11,11 @@
 # production
 /build
 
-#Notes
+#notes
 NOTES.md
+
+#config
+config.js
 
 # misc
 .DS_Store
