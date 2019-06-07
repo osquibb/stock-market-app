@@ -1,6 +1,7 @@
 import React from 'react';
 import { ALPHA_VANTAGE_API_KEY } from '../config';
 import { Line } from 'react-chartjs-2';
+import { Row, Col } from 'reactstrap';
 
 // props: stock='MSFT', range='1D' (1D, 5D, 1M, 3M, 1Y, Max)
 
@@ -169,14 +170,26 @@ export default class StockCell extends React.Component {
 
   render() {    
     return(
-      <React.Fragment>
-        <Line data={this.state.chartData} />
-        <button onClick={() => this.getStockData(this.props.symbol, '1D')}>1D</button>
-        <button onClick={() => this.getStockData(this.props.symbol, '10D')}>10D</button>
-        <button onClick={() => this.getStockData(this.props.symbol, '1M')}>1M</button>
-        <button onClick={() => this.getStockData(this.props.symbol, '3M')}>3M</button>
-        <button onClick={() => this.getStockData(this.props.symbol, '1Y')}>1Y</button>
-      </React.Fragment>
+      <div style={{height: '30vh',
+                   backgroundColor: '#20375B',
+                   borderRadius: 20}}>
+        <Line 
+          data={this.state.chartData}
+          options={
+            {maintainAspectRatio: false}
+          } />
+        <Row>
+          <Col>
+            <div 
+              style={{border: '1px solid #20375B', borderRadius: 10}} 
+              onClick={() => this.getStockData(this.props.symbol, '1D')}>
+                1D
+            </div>
+          </Col>
+        
+        
+        </Row>
+      </div>
     );
   }
 }
