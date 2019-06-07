@@ -6,8 +6,14 @@ import styled from 'styled-components';
 
 // props: stock='MSFT', range='1D' (1D, 10D, 1M, 3M, 1Y, Max)
 
+const ChartContainer = styled.div`
+height: 30vh;
+background-color: #20375B;
+border-radius: 15px;
+`;
+
 const RangeButton = styled.div`
-border: 1px solid #20375B;
+
 background-color: #346E83;
 border-radius: 5px;
 text-align: center;
@@ -27,7 +33,6 @@ text-align: center;
 margin-top: 10px;
 margin-bottom: 10px;
 &:hover {
-  color: white;
   cursor: default;
 }
 `;
@@ -288,15 +293,13 @@ export default class StockCell extends React.Component {
         </Row>
         <Row>
           <Col>
-            <div style={{height: '30vh',
-                        backgroundColor: '#20375B',
-                        borderRadius: 20}}>
+            <ChartContainer>
               <Line 
                 data={this.state.chartData}
                 options={
                   {maintainAspectRatio: false}
                 } />
-            </div>
+            </ChartContainer>
             <Row style={{paddingLeft: 20, paddingRight: 20}}>
               <Col>
                 <StockData>Price : ${Math.round(this.state.price*100)/100}</StockData>
