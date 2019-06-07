@@ -14,12 +14,13 @@ function App() {
             range=''
           />
         </Col>
-        <Col xs='4'>
-          <StockCell 
+        <Col xs='4'>  
+          <StockCell
             symbol='MSFT'
             range=''
           />
         </Col>
+        
       </Row>
     </Container>
     

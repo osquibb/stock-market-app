@@ -2,8 +2,36 @@ import React from 'react';
 import { ALPHA_VANTAGE_API_KEY } from '../config';
 import { Line } from 'react-chartjs-2';
 import { Row, Col } from 'reactstrap';
+import styled from 'styled-components';
 
-// props: stock='MSFT', range='1D' (1D, 5D, 1M, 3M, 1Y, Max)
+// props: stock='MSFT', range='1D' (1D, 10D, 1M, 3M, 1Y, Max)
+
+const RangeButton = styled.div`
+border: 1px solid #20375B;
+background-color: #346E83;
+border-radius: 5px;
+text-align: center;
+margin-top: 10px;
+margin-bottom: 10px;
+&:hover {
+  background-color: #20375B;
+  color: white;
+  border-color: white;
+  cursor: pointer;
+}
+`;
+
+const StockData = styled.div`
+border-radius: 5px;
+text-align: center;
+margin-top: 10px;
+margin-bottom: 10px;
+&:hover {
+  color: white;
+  cursor: default;
+}
+`;
+
 
 export default class StockCell extends React.Component {
   constructor(props) {
@@ -33,13 +61,36 @@ export default class StockCell extends React.Component {
                         data: []
                       }
                     ]
-                  }    
+                  },
+                  price: 0,
+                  change: '0%'    
     };
     this.getStockData = this.getStockData.bind(this);
+    this.getQuote = this.getQuote.bind(this);
   };
 
   componentDidMount() {
     // this.getStockData(this.props.symbol, '1D');
+    // this.getQuote(this.props.symbol);
+  }
+
+  async getQuote(symbol) {
+
+    let price = this.state.price;
+    let change = this.state.change;
+
+    await fetch(`https://www.alphavantage.co/query?function=GLOBAL_QUOTE&symbol=${symbol}&apikey=${ALPHA_VANTAGE_API_KEY}`)
+        .then(response => response.json())
+        .then(data => {
+          if (data["Global Quote"]) {
+            price = data["Global Quote"]["05. price"];
+            change = data["Global Quote"]["10. change percent"];
+          }
+        })
+        .catch(error => console.log(error));
+    
+    this.setState({price: price, change: change})
+
   }
 
   async getStockData(symbol, range) {
@@ -53,104 +104,14 @@ export default class StockCell extends React.Component {
       case '1D':
         fetchURL = `https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=${symbol}&interval=15min&apikey=${ALPHA_VANTAGE_API_KEY}`;
         chartData.labels = ['9:45', '10:00', '10:15', '10:30', '10:45', '11:00', '11:15', '11:30', '11:45', '12:00', '12:15', '12:30', '12:45',
-         '1:00', '1:15', '1:30', '1:45', '2:00', '2:15', '2:30', '2:45', '3:00', '3:15', '3:30', '3:45', '4:00'];
+        '13:00', '13:15', '13:30', '13:45', '14:00', '14:15', '14:30', '14:45', '15:00', '15:15', '15:30', '15:45', '16:00'];
         
         await fetch(fetchURL)
         .then(response => response.json())
         .then(data => {
-        const propValues = new Array(chartData.labels.length);
-        if (data["Meta Data"]) {
-          for (let i=0; i < propValues.length; i++) {
-            propValues[i] = `${data["Meta Data"]["3. Last Refreshed"].split(' ')[0]} ${chartData.labels[i]}:00`;
+          if(!data) {
+            return;
           }
-          chartData.datasets[0].data = new Array(chartData.labels.length);
-          for (let i=0; i < chartData.datasets[0].data.length; i++) {
-            chartData.datasets[0].data[i] = data["Time Series (15min)"][propValues[i]] === undefined ? null : parseFloat(data["Time Series (15min)"][propValues[i]]["4. close"]);
-          }
-        }
-        });
-
-        break;
-        
-      case '10D':
-        fetchURL = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${symbol}&apikey=${ALPHA_VANTAGE_API_KEY}`;
-
-        await fetch(fetchURL)
-        .then(response => response.json())
-        .then(data => {
-          chartData.labels = Object.keys(data["Time Series (Daily)"]).slice(0,10);
-          chartData.labels.reverse();
-          chartData.datasets[0].data = new Array(chartData.labels.length);
-          for (let i=0; i < chartData.datasets[0].data.length; i++) {
-            chartData.datasets[0].data[i] = data["Time Series (Daily)"][chartData.labels[i]] === undefined ? null : parseFloat(data["Time Series (Daily)"][chartData.labels[i]]["4. close"]);
-          }
-        });
-
-        break;
-
-      case '1M':
-      
-        fetchURL = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${symbol}&apikey=${ALPHA_VANTAGE_API_KEY}`;
-
-        await fetch(fetchURL)
-        .then(response => response.json())
-        .then(data => {
-          chartData.labels = Object.keys(data["Time Series (Daily)"]).length >= 30 ?
-            Object.keys(data["Time Series (Daily)"]).slice(0,30) :
-            Object.keys(data["Time Series (Daily)"]);
-          chartData.labels.reverse(); 
-          chartData.datasets[0].data = new Array(chartData.labels.length);
-          for (let i=0; i < chartData.datasets[0].data.length; i++) {
-            chartData.datasets[0].data[i] = data["Time Series (Daily)"][chartData.labels[i]] === undefined ? null : parseFloat(data["Time Series (Daily)"][chartData.labels[i]]["4. close"]);
-          }
-        });
-
-        break;
-
-      case '3M':
-        fetchURL = `https://www.alphavantage.co/query?function=TIME_SERIES_WEEKLY&symbol=${symbol}&apikey=${ALPHA_VANTAGE_API_KEY}`;
-        
-        await fetch(fetchURL)
-        .then(response => response.json())
-        .then(data => {
-          chartData.labels = Object.keys(data["Weekly Time Series"]).length >= 12 ?
-            Object.keys(data["Weekly Time Series"]).slice(0,12) :
-            Object.keys(data["Weekly Time Series"]);
-          chartData.labels.reverse(); 
-          chartData.datasets[0].data = new Array(chartData.labels.length);
-          for (let i=0; i < chartData.datasets[0].data.length; i++) {
-            chartData.datasets[0].data[i] = data["Weekly Time Series"][chartData.labels[i]] === undefined ? null : parseFloat(data["Weekly Time Series"][chartData.labels[i]]["4. close"]);
-          }
-        });
-        
-        break;
-
-      case '1Y':
-        fetchURL = `https://www.alphavantage.co/query?function=TIME_SERIES_MONTHLY&symbol=${symbol}&apikey=${ALPHA_VANTAGE_API_KEY}`;
-        
-        await fetch(fetchURL)
-        .then(response => response.json())
-        .then(data => {
-          chartData.labels = Object.keys(data["Monthly Time Series"]).length >= 12 ?
-            Object.keys(data["Monthly Time Series"]).slice(0,12) :
-            Object.keys(data["Monthly Time Series"]);
-          chartData.labels.reverse(); 
-          chartData.datasets[0].data = new Array(chartData.labels.length);
-          for (let i=0; i < chartData.datasets[0].data.length; i++) {
-            chartData.datasets[0].data[i] = data["Monthly Time Series"][chartData.labels[i]] === undefined ? null : parseFloat(data["Monthly Time Series"][chartData.labels[i]]["4. close"]);
-          }
-        });
-
-        break;
-
-      default:
-          fetchURL = `https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=${symbol}&interval=15min&apikey=${ALPHA_VANTAGE_API_KEY}`;
-          chartData.labels = ['9:45', '10:00', '10:15', '10:30', '10:45', '11:00', '11:15', '11:30', '11:45', '12:00', '12:15', '12:30', '12:45',
-           '1:00', '1:15', '1:30', '1:45', '2:00', '2:15', '2:30', '2:45', '3:00', '3:15', '3:30', '3:45', '4:00'];
-          
-          await fetch(fetchURL)
-          .then(response => response.json())
-          .then(data => {
           const propValues = new Array(chartData.labels.length);
           if (data["Meta Data"]) {
             for (let i=0; i < propValues.length; i++) {
@@ -161,7 +122,129 @@ export default class StockCell extends React.Component {
               chartData.datasets[0].data[i] = data["Time Series (15min)"][propValues[i]] === undefined ? null : parseFloat(data["Time Series (15min)"][propValues[i]]["4. close"]);
             }
           }
-          });
+        })
+        .catch(error => console.log(error));
+
+        break;
+        
+      case '10D':
+        fetchURL = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${symbol}&apikey=${ALPHA_VANTAGE_API_KEY}`;
+
+        await fetch(fetchURL)
+        .then(response => response.json())
+        .then(data => {
+          if(!data) {
+            return;
+          }
+          if (Object.keys(data)) {
+            chartData.labels = Object.keys(data["Time Series (Daily)"]).slice(0,10);
+            chartData.labels.reverse();
+            chartData.datasets[0].data = new Array(chartData.labels.length);
+            for (let i=0; i < chartData.datasets[0].data.length; i++) {
+              chartData.datasets[0].data[i] = data["Time Series (Daily)"][chartData.labels[i]] === undefined ? null : parseFloat(data["Time Series (Daily)"][chartData.labels[i]]["4. close"]);
+            }
+          }
+        })
+        .catch(error => console.log(error));
+
+        break;
+
+      case '1M':
+      
+        fetchURL = `https://www.alphavantage.co/query?function=TIME_SERIES_DAILY&symbol=${symbol}&apikey=${ALPHA_VANTAGE_API_KEY}`;
+
+        await fetch(fetchURL)
+        .then(response => response.json())
+        .then(data => {
+          if(!data) {
+            return;
+          }
+          if (Object.keys(data)) {
+            chartData.labels = Object.keys(data["Time Series (Daily)"]).length >= 30 ?
+            Object.keys(data["Time Series (Daily)"]).slice(0,30) :
+            Object.keys(data["Time Series (Daily)"]);
+            chartData.labels.reverse(); 
+            chartData.datasets[0].data = new Array(chartData.labels.length);
+            for (let i=0; i < chartData.datasets[0].data.length; i++) {
+              chartData.datasets[0].data[i] = data["Time Series (Daily)"][chartData.labels[i]] === undefined ? null : parseFloat(data["Time Series (Daily)"][chartData.labels[i]]["4. close"]);
+            }
+          }
+        })
+        .catch(error => console.log(error));
+
+        break;
+
+      case '3M':
+        fetchURL = `https://www.alphavantage.co/query?function=TIME_SERIES_WEEKLY&symbol=${symbol}&apikey=${ALPHA_VANTAGE_API_KEY}`;
+        
+        await fetch(fetchURL)
+        .then(response => response.json())
+        .then(data => {
+          if(!data) {
+            return;
+          }
+          if (Object.keys(data)) {
+            chartData.labels = Object.keys(data["Weekly Time Series"]).length >= 12 ?
+            Object.keys(data["Weekly Time Series"]).slice(0,12) :
+            Object.keys(data["Weekly Time Series"]);
+            chartData.labels.reverse(); 
+            chartData.datasets[0].data = new Array(chartData.labels.length);
+            for (let i=0; i < chartData.datasets[0].data.length; i++) {
+              chartData.datasets[0].data[i] = data["Weekly Time Series"][chartData.labels[i]] === undefined ? null : parseFloat(data["Weekly Time Series"][chartData.labels[i]]["4. close"]);
+            }
+          }
+        })
+        .catch(error => console.log(error));
+        
+        break;
+
+      case '1Y':
+        fetchURL = `https://www.alphavantage.co/query?function=TIME_SERIES_MONTHLY&symbol=${symbol}&apikey=${ALPHA_VANTAGE_API_KEY}`;
+        
+        await fetch(fetchURL)
+        .then(response => response.json())
+        .then(data => {
+          if(!data) {
+            return;
+          }
+          if (Object.keys(data)) {
+            chartData.labels = Object.keys(data["Monthly Time Series"]).length >= 12 ?
+            Object.keys(data["Monthly Time Series"]).slice(0,12) :
+            Object.keys(data["Monthly Time Series"]);
+            chartData.labels.reverse(); 
+            chartData.datasets[0].data = new Array(chartData.labels.length);
+            for (let i=0; i < chartData.datasets[0].data.length; i++) {
+              chartData.datasets[0].data[i] = data["Monthly Time Series"][chartData.labels[i]] === undefined ? null : parseFloat(data["Monthly Time Series"][chartData.labels[i]]["4. close"]);
+            }
+          }
+        })
+        .catch(error => console.log(error));
+
+        break;
+
+      default:
+          fetchURL = `https://www.alphavantage.co/query?function=TIME_SERIES_INTRADAY&symbol=${symbol}&interval=15min&apikey=${ALPHA_VANTAGE_API_KEY}`;
+          chartData.labels = ['9:45', '10:00', '10:15', '10:30', '10:45', '11:00', '11:15', '11:30', '11:45', '12:00', '12:15', '12:30', '12:45',
+           '13:00', '13:15', '13:30', '13:45', '14:00', '14:15', '14:30', '14:45', '15:00', '15:15', '15:30', '15:45', '16:00'];
+          
+          await fetch(fetchURL)
+          .then(response => response.json())
+          .then(data => {
+          if(!data) {
+            return;
+          }
+          const propValues = new Array(chartData.labels.length);
+          if (data["Meta Data"]) {
+            for (let i=0; i < propValues.length; i++) {
+              propValues[i] = `${data["Meta Data"]["3. Last Refreshed"].split(' ')[0]} ${chartData.labels[i]}:00`;
+            }
+            chartData.datasets[0].data = new Array(chartData.labels.length);
+            for (let i=0; i < chartData.datasets[0].data.length; i++) {
+              chartData.datasets[0].data[i] = data["Time Series (15min)"][propValues[i]] === undefined ? null : parseFloat(data["Time Series (15min)"][propValues[i]]["4. close"]);
+            }
+          }
+          })
+          .catch(error => console.log(error));
     }
 
     this.setState({chartData: chartData});
@@ -170,26 +253,61 @@ export default class StockCell extends React.Component {
 
   render() {    
     return(
-      <div style={{height: '30vh',
-                   backgroundColor: '#20375B',
-                   borderRadius: 20}}>
-        <Line 
-          data={this.state.chartData}
-          options={
-            {maintainAspectRatio: false}
-          } />
+      <React.Fragment>
+        <Row style={{paddingLeft: 20, paddingRight: 20}}>
+          <Col>
+            <RangeButton
+              onClick={() => this.getStockData(this.props.symbol, '1D')}>
+              1D
+            </RangeButton>
+          </Col>
+          <Col>
+            <RangeButton
+              onClick={() => this.getStockData(this.props.symbol, '10D')}>
+              10D
+            </RangeButton>
+          </Col>
+          <Col>
+            <RangeButton
+              onClick={() => this.getStockData(this.props.symbol, '1M')}>
+              1M
+            </RangeButton>
+          </Col>
+          <Col>
+            <RangeButton
+              onClick={() => this.getStockData(this.props.symbol, '3M')}>
+              3M
+            </RangeButton>
+          </Col>
+          <Col>
+            <RangeButton
+              onClick={() => this.getStockData(this.props.symbol, '1Y')}>
+              1Y
+            </RangeButton>
+          </Col>
+        </Row>
         <Row>
           <Col>
-            <div 
-              style={{border: '1px solid #20375B', borderRadius: 10}} 
-              onClick={() => this.getStockData(this.props.symbol, '1D')}>
-                1D
+            <div style={{height: '30vh',
+                        backgroundColor: '#20375B',
+                        borderRadius: 20}}>
+              <Line 
+                data={this.state.chartData}
+                options={
+                  {maintainAspectRatio: false}
+                } />
             </div>
+            <Row style={{paddingLeft: 20, paddingRight: 20}}>
+              <Col>
+                <StockData>Price : ${Math.round(this.state.price*100)/100}</StockData>
+              </Col>
+              <Col>
+                <StockData>Change : <span style={{color: parseInt(this.state.change.substring(0, this.state.change.length - 1)) >= 0 ? 'green': 'red'}}>{this.state.change}</span></StockData>
+              </Col>
+            </Row>
           </Col>
-        
-        
         </Row>
-      </div>
+      </React.Fragment>
     );
   }
 }
