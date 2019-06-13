@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-export const AddStockCellButton = () => {
+export const AddStockCellButton = (props) => {
   
   const Button = styled.button`
   background-color: #346E83;
@@ -17,7 +17,7 @@ export const AddStockCellButton = () => {
   `;
   
   return(
-    <Button>
+    <Button onClick={props.onClick}>
       Add Stock Chart
     </Button>
   );

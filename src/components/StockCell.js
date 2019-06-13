@@ -97,8 +97,12 @@ export default class StockCell extends React.Component {
     this.selectSymbol = this.selectSymbol.bind(this);
   };
 
+  componentDidMount() {
+    console.log('Stock Cell Mounted');
+  }
+
   selectSymbol(e) {
-    if (e.keyCode == 13) {
+    if (e.keyCode === 13) {
       this.setState({symbol: e.target.value}, () => {
         this.getQuote(this.state.symbol);
         this.getStockData(this.state.symbol);

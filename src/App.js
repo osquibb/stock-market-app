@@ -12,20 +12,23 @@ class App extends React.Component {
     this.state = { stockCells: 
       [
         <StockCell />,
-        <AddStockCellButton />
-      ] 
+        <AddStockCellButton onClick={() => this.addStockCell()} />
+      ],
+      nextStockCellID: 0
     };
   }
 
-  addStockCell(symbol, range) {
-    const newStockCell = <StockCell />
+  addStockCell() {
+    const stockCells = [this.state.stockCells];
+    stockCells.splice(stockCells.length - 2, 0, <StockCell />);
+    this.setState({stockCells});
   }
 
   render() {
 
     const RenderStockCells = () => {
-      return this.state.stockCells.map(stockCell => {
-        return(<Col xs='6' className="text-center">  
+      return this.state.stockCells.map((stockCell, index) => {
+        return(<Col xs='6' className="text-center" key={index}>  
           {stockCell}
         </Col>);
       });
