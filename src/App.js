@@ -18,6 +18,8 @@ class App extends React.Component {
     };
   }
 
+  // May need unique keys (instead of array indicies) to prevent re-rendering
+
   addStockCell() {
     const stockCells = [this.state.stockCells];
     stockCells.splice(stockCells.length - 2, 0, <StockCell />);
