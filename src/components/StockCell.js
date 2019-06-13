@@ -8,6 +8,7 @@ import styled from 'styled-components';
 
 const ChartContainer = styled.div`
 height: 30vh;
+min-width: 200px;
 background-color: #20375B;
 border-radius: 15px;
 `;
@@ -34,6 +35,26 @@ margin-top: 10px;
 margin-bottom: 10px;
 &:hover {
   cursor: default;
+}
+`;
+
+const StockInput = styled.input`
+border-radius: 5px;
+margin-top: 10px;
+margin-bottom: 10px;
+padding-left: 5px;
+min-width: 200px;
+border: 1px solid black;
+background-color: #346E83;
+color: white;
+::placeholder {
+  color: white;
+}
+&:focus {
+  outline: none;
+}
+&:hover {
+  border-color: white;
 }
 `;
 
@@ -68,15 +89,21 @@ export default class StockCell extends React.Component {
                     ]
                   },
                   price: 0,
-                  change: '0%'    
+                  change: '0%',
+                  symbol: null    
     };
     this.getStockData = this.getStockData.bind(this);
     this.getQuote = this.getQuote.bind(this);
+    this.selectSymbol = this.selectSymbol.bind(this);
   };
 
-  componentDidMount() {
-    // this.getStockData(this.props.symbol, '1D');
-    // this.getQuote(this.props.symbol);
+  selectSymbol(e) {
+    if (e.keyCode == 13) {
+      this.setState({symbol: e.target.value}, () => {
+        this.getQuote(this.state.symbol);
+        this.getStockData(this.state.symbol);
+      });
+    }
   }
 
   async getQuote(symbol) {
@@ -259,57 +286,61 @@ export default class StockCell extends React.Component {
   render() {    
     return(
       <React.Fragment>
-        <Row style={{paddingLeft: 20, paddingRight: 20}}>
-          <Col>
-            <RangeButton
-              onClick={() => this.getStockData(this.props.symbol, '1D')}>
-              1D
-            </RangeButton>
-          </Col>
-          <Col>
-            <RangeButton
-              onClick={() => this.getStockData(this.props.symbol, '10D')}>
-              10D
-            </RangeButton>
-          </Col>
-          <Col>
-            <RangeButton
-              onClick={() => this.getStockData(this.props.symbol, '1M')}>
-              1M
-            </RangeButton>
-          </Col>
-          <Col>
-            <RangeButton
-              onClick={() => this.getStockData(this.props.symbol, '3M')}>
-              3M
-            </RangeButton>
-          </Col>
-          <Col>
-            <RangeButton
-              onClick={() => this.getStockData(this.props.symbol, '1Y')}>
-              1Y
-            </RangeButton>
-          </Col>
+        <Row className="justify-content-center" hidden={this.state.symbol !== null}>
+          <StockInput 
+            placeholder="Enter ticker symbol..."
+            onKeyDown={this.selectSymbol}
+          />
         </Row>
-        <Row>
-          <Col>
-            <ChartContainer>
-              <Line 
-                data={this.state.chartData}
-                options={
-                  {maintainAspectRatio: false}
-                } />
-            </ChartContainer>
-            <Row style={{paddingLeft: 20, paddingRight: 20}}>
-              <Col>
-                <StockData>Price : ${Math.round(this.state.price*100)/100}</StockData>
-              </Col>
-              <Col>
-                <StockData>Change : <span style={{color: parseInt(this.state.change.substring(0, this.state.change.length - 1)) >= 0 ? 'green': 'red'}}>{this.state.change}</span></StockData>
-              </Col>
-            </Row>
-          </Col>
-        </Row>
+          <Row hidden={this.state.symbol === null} style={{paddingLeft: 20, paddingRight: 20}}>
+            <Col>
+              <RangeButton
+                onClick={() => this.getStockData(this.state.symbol, '1D')}>
+                1D
+              </RangeButton>
+            </Col>
+            <Col>
+              <RangeButton
+                onClick={() => this.getStockData(this.state.symbol, '10D')}>
+                10D
+              </RangeButton>
+            </Col>
+            <Col>
+              <RangeButton
+                onClick={() => this.getStockData(this.state.symbol, '1M')}>
+                1M
+              </RangeButton>
+            </Col>
+            <Col>
+              <RangeButton
+                onClick={() => this.getStockData(this.state.symbol, '3M')}>
+                3M
+              </RangeButton>
+            </Col>
+            <Col>
+              <RangeButton
+                onClick={() => this.getStockData(this.state.symbol, '1Y')}>
+                1Y
+              </RangeButton>
+            </Col>
+          </Row>
+          <Row>
+            <Col>
+              <ChartContainer>
+                <Line 
+                  data={this.state.chartData}
+                  options={
+                    {maintainAspectRatio: false}
+                  } />
+              </ChartContainer>
+              <Row>
+                <Col>
+                  <StockData><strong>Price</strong> : ${Math.round(this.state.price*100)/100}</StockData>
+                  <StockData><strong>Change</strong> : <span style={{color: parseInt(this.state.change.substring(0, this.state.change.length - 1)) >= 0 ? 'green': 'red'}}>{this.state.change}</span></StockData>
+                </Col>
+              </Row>
+            </Col>
+          </Row>
       </React.Fragment>
     );
   }
