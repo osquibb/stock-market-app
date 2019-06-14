@@ -2,6 +2,7 @@
   "name": "trading-app",
   "version": "0.1.0",
   "private": true,
+  "homepage": "https://osquibb.github.io/trading-app",
   "dependencies": {
     "bootstrap": "^4.3.1",
     "chart.js": "^2.8.0",
