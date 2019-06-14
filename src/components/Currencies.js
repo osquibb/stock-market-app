@@ -1,5 +1,6 @@
 import React from 'react';
 import { Row, Col } from 'reactstrap';
+import CurrencyCell from './CurrencyCell';
 
 
 export const Currencies = (props) => {
@@ -8,10 +9,10 @@ export const Currencies = (props) => {
     <div hidden={!props.selected}>
       <Row>
         <Col>
-          <h2>Currency Cell</h2>
+          <CurrencyCell />
         </Col>
         <Col>
-          <h2>Currency Cell</h2>
+          <CurrencyCell />
         </Col>
       </Row>
     </div>           
