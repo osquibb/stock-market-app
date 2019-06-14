@@ -11,12 +11,11 @@ height: 30vh;
 justify-content: center;
 min-width: 200px;
 min-height: 140px
-background-color: #20375B;
 border-radius: 15px;
 `;
 
 const RangeButton = styled.div`
-background-color: #346E83;
+background-color: #DE7E80;
 border-radius: 5px;
 text-align: center;
 margin-top: 10px;
@@ -45,8 +44,8 @@ margin-top: 20px;
 margin-bottom: 10px;
 padding-left: 5px;
 width: 240px;
-border: 1px solid black;
-background-color: #346E83;
+border: 1px solid transparent;
+background-color: #DE7E80;
 color: white;
 ::placeholder {
   color: white;
@@ -55,7 +54,7 @@ color: white;
   outline: none;
 }
 &:hover {
-  border-color: white;
+  border-color: black;
 }
 `;
 

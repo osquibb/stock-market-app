@@ -10,7 +10,7 @@ height: 30vh;
 justify-content: center;
 min-width: 200px;
 min-height: 140px
-background-color: #20375B;
+border: 1px solid #EAEAE8;
 border-radius: 15px;
 `;
 
@@ -18,12 +18,12 @@ const CurrencyDataTitle = styled.h4`
 height: 60px;
 padding-top: 10px;
 text-align: center;
-color: white;
+color: black;
 `;
 
 const CurrencyData = styled.h6`
 text-align: center;
-color: white;
+color: black;
 `;
 
 const Filler = styled.div`
@@ -37,8 +37,8 @@ margin-top: 20px;
 margin-bottom: 10px;
 padding-left: 5px;
 width: 240px;
-border: 1px solid black;
-background-color: #346E83;
+border: 1px solid transparent;
+background-color: #DE7E80;
 color: white;
 ::placeholder {
   color: white;
@@ -47,7 +47,7 @@ color: white;
   outline: none;
 }
 &:hover {
-  border-color: white;
+  border-color: black;
 }
 `;
 

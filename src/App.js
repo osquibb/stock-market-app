@@ -6,7 +6,7 @@ import { Stocks } from './components/Stocks';
 import { Currencies } from './components/Currencies';
 
 const SideMenu = styled.div`
-  background-color: #346E83;
+  background-color: #DE7E80;
   padding-top: 10px;
   width: 100%;
   height: 100%;
