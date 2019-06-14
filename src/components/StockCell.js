@@ -8,13 +8,14 @@ import styled from 'styled-components';
 
 const ChartContainer = styled.div`
 height: 30vh;
+justify-content: center;
 min-width: 200px;
+min-height: 140px
 background-color: #20375B;
 border-radius: 15px;
 `;
 
 const RangeButton = styled.div`
-
 background-color: #346E83;
 border-radius: 5px;
 text-align: center;
@@ -31,8 +32,8 @@ margin-bottom: 10px;
 const StockData = styled.div`
 border-radius: 5px;
 text-align: center;
-margin-top: 10px;
-margin-bottom: 10px;
+margin-top: 5px;
+margin-bottom: 5px;
 &:hover {
   cursor: default;
 }
@@ -40,10 +41,10 @@ margin-bottom: 10px;
 
 const StockInput = styled.input`
 border-radius: 5px;
-margin-top: 10px;
+margin-top: 20px;
 margin-bottom: 10px;
 padding-left: 5px;
-min-width: 200px;
+width: 240px;
 border: 1px solid black;
 background-color: #346E83;
 color: white;
@@ -134,7 +135,7 @@ export default class StockCell extends React.Component {
     const chartData = {...this.state.chartData};
 
     let fetchURL = '';
-    chartData.datasets[0].label = `${symbol} - ${range} Close`;
+    chartData.datasets[0].label = `${symbol} ${range ? range: ''}`;
 
     switch (range) {
       case '1D':
