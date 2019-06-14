@@ -20,6 +20,8 @@ border-radius: 5px;
 text-align: center;
 margin-top: 10px;
 margin-bottom: 10px;
+padding-left: 2px;
+padding-right: 2px;
 &:hover {
   background-color: #20375B;
   color: white;
@@ -103,7 +105,7 @@ export default class StockCell extends React.Component {
 
   selectSymbol(e) {
     if (e.keyCode === 13) {
-      this.setState({symbol: e.target.value}, () => {
+      this.setState({symbol: e.target.value.toUpperCase()}, () => {
         this.getQuote(this.state.symbol);
         this.getStockData(this.state.symbol);
       });
