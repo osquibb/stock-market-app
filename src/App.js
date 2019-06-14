@@ -12,7 +12,7 @@ const SideMenu = styled.div`
   height: 100%;
 `;
 
-const SideMenuItem = styled.h3`
+const SideMenuItem = styled.h6`
   width: 100%;
   border-top: 1px solid;
   border-bottom: 1px solid;
